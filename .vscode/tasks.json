@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Doctor (Practice readiness)", "type": "shell", "command": "python -m arena_clients.doctor", "problemMatcher": [] },
+    { "label": "Run all tests", "type": "shell", "command": "python -m unittest discover -s tests", "group": { "kind": "test", "isDefault": true }, "problemMatcher": [] },
+    { "label": "Benchmark summary", "type": "shell", "command": "python scripts/practice_bench.py --summary", "problemMatcher": [] },
+    { "label": "Package submission", "type": "shell", "command": "python scripts/package_sentinel.py --force", "problemMatcher": [] }
+  ]
+}

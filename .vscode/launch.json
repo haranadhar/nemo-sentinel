@@ -1,0 +1,68 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "1. NemoSentinel vs Practice",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/sentinel/agent.py",
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "2. Baseline Python Simple vs Practice",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/examples/python_simple/agent.py",
+      "cwd": "${workspaceFolder}/examples/python_simple",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "3a. Mock arena (pick scenario)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/mock_arena.py",
+      "args": ["--scenario", "${input:scenario}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "3b. NemoSentinel vs mock arena",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_local.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "4. Practice benchmark (5 runs)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/practice_bench.py",
+      "args": ["--runs", "5"],
+      "cwd": "${workspaceFolder}",
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "★ Rehearse offline: mock arena + NemoSentinel",
+      "configurations": ["3a. Mock arena (pick scenario)", "3b. NemoSentinel vs mock arena"],
+      "stopAll": true
+    }
+  ],
+  "inputs": [
+    {
+      "id": "scenario",
+      "type": "pickString",
+      "description": "Black-box scenario",
+      "options": ["vault", "cipher", "ledger", "image"],
+      "default": "vault"
+    }
+  ]
+}
