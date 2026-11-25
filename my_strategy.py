@@ -32,6 +32,8 @@ class MyStrategy(BaseStrategy):
     # roster are used; anything else is ignored, so this is safe to leave
     # populated with Practice names.
     preferred_text_models: list[str] = ["nemotron-3-super"]
+    # Image models to try first; empty = strongest available first (router).
+    # Practice: pro-image beat flash-image (edit 87.8 vs 86.0, generate 89.8 vs 85.2).
     preferred_image_models: list[str] = []
     # Fraction of usable time spent exploring challenge tools.
     explore_fraction = 0.30
@@ -40,12 +42,14 @@ class MyStrategy(BaseStrategy):
     planner_rounds = 2
     # Models tried for the main solve before falling back to deterministic data.
     max_solve_attempts = 3
-    # Nemotron reasoning on easy puzzles too. Quality (70%) outweighs speed
-    # (15%); flip to False only if Practice shows easy puzzles stay correct
-    # without it.
-    reasoning_on_easy = True
-    # Image: analyse source before edit, verify output, regenerate once on FAIL.
+    # Nemotron reasoning on easy puzzles. Off: Practice easy puzzles were 100%
+    # correct but took 21-43 s with reasoning on (speed score 26-63).
+    reasoning_on_easy = False
+    # Image: verify output against the constraints, regenerate once on FAIL.
     image_self_check = True
+    # Describe the source image before editing and append it to the prompt.
+    # Off: on Practice it lowered edit quality and added latency.
+    image_analyze_source = False
 
     # Text solver
     text_temperature = 0.0

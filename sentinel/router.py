@@ -123,6 +123,9 @@ def rank_image_models(available: list[str], model_rows: list[dict] | None = None
         caps = rows.get(m, {}).get("capabilities")
         if (isinstance(caps, list) and "image" in caps) or m.endswith("-image") or is_image_model(m):
             capable.append(m)
+    # Strongest first (pro/ultra above flash above lite): image quality is
+    # scored by a judge and outweighs the few seconds a stronger model costs.
+    capable.sort(key=lambda m: (-strength(m), len(_FAST_WORDS.findall(m))))
     pref = [p for p in (preferred or []) if p in capable]
     return pref + [m for m in capable if m not in pref]
 

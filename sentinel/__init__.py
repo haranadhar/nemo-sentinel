@@ -14,4 +14,4 @@ Only the standard library plus the starter kit's locked dependencies are used,
 so the submission lockfile does not change.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"

@@ -136,15 +136,15 @@ class TextScenarioTests(unittest.TestCase):
         run(TextRun(ports, []).run())
         self.assertIn("[decoded base64]", seen["prompt"])
         self.assertEqual(http.submits, ["lisbon"])
-        # MyStrategy.reasoning_on_easy=True: Nemotron keeps reasoning on.
-        self.assertNotIn("extra_body", client.completions.requests[0])
+        # MyStrategy.reasoning_on_easy=False: easy puzzles skip Nemotron reasoning.
+        self.assertEqual(client.completions.requests[0].get("extra_body"), {"reasoning": {"enabled": False}})
 
-    def test_reasoning_off_on_easy_when_strategy_says_so(self):
+    def test_reasoning_on_easy_when_strategy_says_so(self):
         mcp = FakeMcp(challenge={"description": "2+2?", "rules": "Integer only.", "max_time_s": 60}, clues=[], tools=[])
         ports, client = make_ports(mcp, FakeHttp(), lambda *a: "ANSWER: 4")
-        ports.strategy.reasoning_on_easy = False
+        ports.strategy.reasoning_on_easy = True
         run(TextRun(ports, []).run())
-        self.assertEqual(client.completions.requests[0].get("extra_body"), {"reasoning": {"enabled": False}})
+        self.assertNotIn("extra_body", client.completions.requests[0])
 
     def test_format_repair_json(self):
         mcp = FakeMcp(challenge={"description": "Give the two primes below 6 greater than 2.",
@@ -267,12 +267,18 @@ class ImageScenarioTests(unittest.TestCase):
         mcp, counter = self.image_arena(["FAIL: bicycle still red"])
         http = FakeHttp()
         ports, _ = make_ports(mcp, http, lambda *a: "")
+        ports.strategy.image_analyze_source = True
         report = run(ImageRun(ports, run(mcp.list_tool_defs())).run())
         self.assertEqual(counter["edits"], 2)  # regenerated once after FAIL
         self.assertEqual(mcp.submitted_image, "data:image/png;base64,EDIT2")
         self.assertEqual(mcp.called("image_edit")[0]["model"], "flux-image")
         self.assertIn("Preserve everything", mcp.called("image_edit")[0]["prompt"])
         self.assertEqual(report.missing_required_tools, [])
+        # Default: no source analysis, the edit prompt stays the bare instruction.
+        mcp2, _ = self.image_arena(["PASS"])
+        ports2, _ = make_ports(mcp2, FakeHttp(), lambda *a: "")
+        run(ImageRun(ports2, run(mcp2.list_tool_defs())).run())
+        self.assertNotIn("Preserve everything", mcp2.called("image_edit")[0]["prompt"])
         self.assertTrue(mcp.thoughts)
 
     def test_edit_pass_no_regeneration(self):

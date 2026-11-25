@@ -739,7 +739,10 @@ class ImageRun:
         analyze_ok = "image_analyze" in tools and getattr(self.s, "image_self_check", True)
 
         # 1) Analyse the source before editing (preservation), when time allows.
-        if choice == "image_edit" and input_uri and analyze_ok and self.deadline.usable() > max(40.0, self.deadline.total_s * 0.5):
+        # Off by default: on Practice a long source description diluted the edit
+        # instruction (lower quality) and cost ~5 s. Opt in via image_analyze_source.
+        analyze_source = analyze_ok and bool(getattr(self.s, "image_analyze_source", False))
+        if choice == "image_edit" and input_uri and analyze_source and self.deadline.usable() > max(40.0, self.deadline.total_s * 0.5):
             a = await self._call(
                 "image_analyze",
                 self._tool_args("image_analyze", {"image_uri": input_uri, "question": "Describe the key subjects, layout, colours and style precisely.", "agent_id": self.p.agent_id}, models[0]),
